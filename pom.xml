@@ -5,7 +5,7 @@
 	<groupId>io.interlockledger</groupId>
 	<artifactId>io.interlockledger.jsondocument</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>il2jsonstore</name>
+	<name>io.interlockledger.jsondocument</name>
 	<description>Support for encoding/decoding JsonDocument il2 records</description>
 	<url>https://github.com/interlockledger/io.interlockledger.jsondocument</url>
 	<organization>
@@ -33,6 +33,11 @@
 			<artifactId>junit</artifactId>
 			<version>4.13.2</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.interlockledger.iltags</groupId>
+			<artifactId>iltags</artifactId>
+			<version>1.0.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
