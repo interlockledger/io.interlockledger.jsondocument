@@ -3,7 +3,7 @@
 	<name>io.interlockledger.jsondocument</name>
 	<comment></comment>
 	<projects>
-		<project>iltags</project>
+		<project>tags</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
