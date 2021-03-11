@@ -25,7 +25,7 @@
 	   <repository>
 	     <id>github</id>
 	     <name>GitHub interlockledger Apache Maven Packages</name>
-	     <url>https://maven.pkg.github.com/interlockledger/interlockledger-rest-client-java</url>
+	     <url>https://maven.pkg.github.com/interlockledger/io.interlockledger.rest-client</url>
 	   </repository>
 	</distributionManagement>
 	<properties>
