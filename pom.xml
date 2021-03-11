@@ -21,6 +21,13 @@
 			<url>https://opensource.org/licenses/BSD-3-Clause</url>
 		</license>
 	</licenses>
+	<distributionManagement>
+	   <repository>
+	     <id>github</id>
+	     <name>GitHub interlockledger Apache Maven Packages</name>
+	     <url>https://maven.pkg.github.com/interlockledger/interlockledger-rest-client-java</url>
+	   </repository>
+	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -35,8 +42,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>io.interlockledger.iltags</groupId>
-			<artifactId>iltags</artifactId>
+			<groupId>io.interlockledger</groupId>
+			<artifactId>io.interlockledger.tags</artifactId>
 			<version>1.0.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
