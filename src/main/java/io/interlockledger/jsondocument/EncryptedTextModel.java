@@ -63,5 +63,67 @@ public class EncryptedTextModel {
 		Collections.addAll(keys, readingKeys);
 		return keys;
 	}
+	
+    //public String DecodedWith(X509Certificate2 certificate) {
+    //    if (certificate is null)
+    //        return "ERROR: No key provided to decode EncryptedText";
+    //    if (!certificate.HasPrivateKey)
+    //        return "ERROR: Certificate has no private key to be able to decode EncryptedText";
+    //    string certKeyId = certificate.ToKeyId();
+    //    string pubKeyHash = certificate.ToPubKeyHash();
+    //    if (pubKeyHash is null)
+    //        return "ERROR: Non-RSA certificate is not currently supported";
+    //    if (model.ReadingKeys.SkipNulls().None())
+    //        return "ERROR: No reading keys able to decode EncryptedText";
+    //    var authorizedKey = model.ReadingKeys.FirstOrDefault(rk => rk.PublicKeyHash == pubKeyHash && rk.ReaderId == certKeyId);
+    //    if (authorizedKey is null)
+    //        return "ERROR: Your key does not match one of the authorized reading keys";
+    //    string cipher = model.Cipher.WithDefault("AES256").ToUpperInvariant();
+    //    if (cipher != "AES256")
+    //        return $"ERROR: Cipher {cipher} is not currently supported";
+    //    if (model.CipherText.None())
+    //        return null;
+    //    using var rsaAlgo = certificate.GetRSAPrivateKey();
+    //    var aesKey = RSADecrypt(rsaAlgo, authorizedKey.EncryptedKey);
+    //    var aesIV = RSADecrypt(rsaAlgo, authorizedKey.EncryptedIV);
+    //    var jsonBytes = AES256Decrypt(model.CipherText, aesKey, aesIV);
+    //    if (jsonBytes[0] != 17)
+    //        return "ERROR: Something went wrong while decrypting the content. Unexpected initial bytes";
+    //    var skipTagAndSize = ILIntHelpers.ILIntDecode(jsonBytes[1..]).ILIntSize() + 1;
+    //    return jsonBytes[skipTagAndSize..].AsUTF8String();
+
+    //    static byte[] RSADecrypt(RSA rsaAlgo, byte[] data, int maxRetries = 3) {
+    //        int retries = maxRetries;
+    //        while (true)
+    //            try {
+    //                try {
+    //                    return rsaAlgo.Decrypt(data, RSAEncryptionPadding.OaepSHA1);
+    //                } catch (CryptographicException) {
+    //                    return rsaAlgo.Decrypt(data, RSAEncryptionPadding.CreateOaep(HashAlgorithmName.MD5));
+    //                }
+    //            } catch (CryptographicException e) {
+    //                if (retries-- <= 0)
+    //                    throw new InvalidOperationException($"Failed to decrypt data with current parameters after {maxRetries} retries", e);
+    //            }
+    //    }
+
+    //    static byte[] AES256Decrypt(byte[] cipherData, byte[] key, byte[] iv) {
+    //        if (cipherData is null)
+    //            throw new ArgumentNullException(nameof(cipherData));
+    //        using var source = new MemoryStream(cipherData);
+    //        using var algorithm = new RijndaelManaged {
+    //            KeySize = 256,
+    //            BlockSize = 128,
+    //            IV = iv,
+    //            Key = key,
+    //            Mode = CipherMode.CBC,
+    //            Padding = PaddingMode.Zeros
+    //        };
+    //        using var cs = new CryptoStream(source, algorithm.CreateDecryptor(), CryptoStreamMode.Read);
+    //        using var dest = new MemoryStream();
+    //        cs.CopyTo(dest);
+    //        return dest.ToArray();
+    //    }
+    //}
 
 }
