@@ -114,7 +114,7 @@ public final class ForString {
 			final StringBuilder sb = new StringBuilder("^");
 			pattern.AppendPatternMiddle(sb);
 			sb.append('$');
-			String regex = sb.toString();
+			final String regex = sb.toString();
 			final Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(safe);
 			if (matcher.find())
 				return matcher.group(1);

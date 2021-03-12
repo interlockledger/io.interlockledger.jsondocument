@@ -47,14 +47,20 @@ public class ForStringTest {
 		assertEquals("null with no chars should return empty string", "", ForString.Trim(null));
 		assertEquals("empty with no chars should return empty string", "", ForString.Trim(""));
 		assertEquals("only whitespace with no chars should return same string", " \r\n ", ForString.Trim(" \r\n "));
-		assertEquals("some letters with whitespace with no chars should return same string", " abc  ", ForString.Trim(" abc  "));
+		assertEquals("some letters with whitespace with no chars should return same string", " abc  ",
+				ForString.Trim(" abc  "));
 		assertEquals("null with one char should return empty string", "", ForString.Trim(null, ' '));
 		assertEquals("empty with one char should return empty string", "", ForString.Trim("", ' '));
-		assertEquals("only whitespace with one non-whitespace char should return same string", " \r\n ", ForString.Trim(" \r\n ", 'z'));
-		assertEquals("only whitespace with one matching whitespace char should return trimmed string", "\r\n", ForString.Trim(" \r\n ", ' '));
-		assertEquals("some letters with matching chars should return trimmed string", "cdefghijklmnopqrstuvwx", ForString.Trim("abcdefghijklmnopqrstuvwxyz", 'a', 'b', 'y', 'z', 'r'));
-		assertEquals("some non-ascii letters with matching chars should return trimmed string", "bcdefghijklmnopqrstuvwxy", ForString.Trim("ãbcdefghijklmnopqrstuvwxyçã", 'ã', 'ç', 'é'));
-		assertEquals("some letters with whitespace with one matching whitespace should return trimmed string", "abc", ForString.Trim(" abc ", ' '));
+		assertEquals("only whitespace with one non-whitespace char should return same string", " \r\n ",
+				ForString.Trim(" \r\n ", 'z'));
+		assertEquals("only whitespace with one matching whitespace char should return trimmed string", "\r\n",
+				ForString.Trim(" \r\n ", ' '));
+		assertEquals("some letters with matching chars should return trimmed string", "cdefghijklmnopqrstuvwx",
+				ForString.Trim("abcdefghijklmnopqrstuvwxyz", 'a', 'b', 'y', 'z', 'r'));
+		assertEquals("some non-ascii letters with matching chars should return trimmed string",
+				"bcdefghijklmnopqrstuvwxy", ForString.Trim("ãbcdefghijklmnopqrstuvwxyçã", 'ã', 'ç', 'é'));
+		assertEquals("some letters with whitespace with one matching whitespace should return trimmed string", "abc",
+				ForString.Trim(" abc ", ' '));
 	}
 
 	@Test

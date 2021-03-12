@@ -2,15 +2,68 @@ package io.interlockledger.jsondocument;
 
 import static io.interlockledger.extensions.ForByteArray.*;
 import static io.interlockledger.extensions.ForString.*;
+import static io.interlockledger.extensions.ForX509Certificate.*;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
+import io.interlockledger.iltags.ilint.ILIntCodec;
+import io.interlockledger.iltags.ilint.ILIntException;
 
 public class EncryptedTextModel {
 	private String _cipher;
 	private byte[] _cipherText;
 	private Iterable<ReadingKeyModel> _readingKeys;
 	private int _readingKeysCount;
+
+	public String DecodedWith(X509Certificate certificate, RSAPrivateKey privateKey)
+			throws ILIntException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException,
+			BadPaddingException, IllegalBlockSizeException {
+		if (certificate == null)
+			return "ERROR: No certificate provided to decode EncryptedText";
+		if (privateKey == null)
+			return "ERROR: No private key to be able to decode EncryptedText";
+		final String certKeyId = ToKeyId(certificate);
+		final String pubKeyHash = ToPubKeyHash(certificate);
+		if (pubKeyHash == null)
+			return "ERROR: Non-RSA certificate is not currently supported";
+		final Iterable<ReadingKeyModel> readingKeys = getReadingKeys();
+		if (readingKeys == null)
+			return "ERROR: No reading keys able to decode EncryptedText";
+		for (final ReadingKeyModel rk : readingKeys) {
+			if (rk.getPublicKeyHash() == pubKeyHash && rk.getReaderId() == certKeyId) {
+				final String cipher = WithDefault(getCipher(), "AES256").toUpperCase();
+				if (cipher != "AES256")
+					return "ERROR: Cipher " + cipher + " is not currently supported";
+				if (getCipherText() == null)
+					return null;
+				final byte[] aesKey = RSADecrypt(privateKey, rk.getEncryptedKey());
+				final byte[] aesIV = RSADecrypt(privateKey, rk.getEncryptedIV());
+				final byte[] jsonBytes = AES256Decrypt(getCipherText(), aesKey, aesIV);
+				final ByteBuffer bb = ByteBuffer.wrap(jsonBytes);
+				final long tagType = ILIntCodec.decode(bb);
+				if (tagType != 17)
+					return "ERROR: Something went wrong while decrypting the content. Unexpected initial bytes";
+				final long textSize = ILIntCodec.decode(bb);
+				final int sizeSize = ILIntCodec.getEncodedSize(textSize);
+				return new String(Arrays.copyOfRange(jsonBytes, sizeSize + 1, jsonBytes.length - 1),
+						StandardCharsets.UTF_8);
+			}
+		}
+		return "ERROR: Your key does not match one of the authorized reading keys";
+	}
 
 	public String getCipher() {
 		return _cipher;
@@ -47,6 +100,13 @@ public class EncryptedTextModel {
 				Ellipsis(ToSafeBase64(_cipherText), 135));
 	}
 
+	public static byte[] RSADecrypt(RSAPrivateKey privateKey, byte[] data) throws NoSuchPaddingException,
+			NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+		final Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
+		cipher.init(Cipher.DECRYPT_MODE, privateKey);
+		return cipher.doFinal(data);
+	}
+
 	private static int Count(Iterable<ReadingKeyModel> readingKeys) {
 		if (readingKeys == null)
 			return 0;
@@ -63,74 +123,5 @@ public class EncryptedTextModel {
 		Collections.addAll(keys, readingKeys);
 		return keys;
 	}
-
-	// public String DecodedWith(X509Certificate2 certificate) {
-	// if (certificate is null)
-	// return "ERROR: No key provided to decode EncryptedText";
-	// if (!certificate.HasPrivateKey)
-	// return "ERROR: Certificate has no private key to be able to decode
-	// EncryptedText";
-	// string certKeyId = certificate.ToKeyId();
-	// string pubKeyHash = certificate.ToPubKeyHash();
-	// if (pubKeyHash is null)
-	// return "ERROR: Non-RSA certificate is not currently supported";
-	// if (model.ReadingKeys.SkipNulls().None())
-	// return "ERROR: No reading keys able to decode EncryptedText";
-	// var authorizedKey = model.ReadingKeys.FirstOrDefault(rk => rk.PublicKeyHash
-	// == pubKeyHash && rk.ReaderId == certKeyId);
-	// if (authorizedKey is null)
-	// return "ERROR: Your key does not match one of the authorized reading keys";
-	// string cipher = model.Cipher.WithDefault("AES256").ToUpperInvariant();
-	// if (cipher != "AES256")
-	// return $"ERROR: Cipher {cipher} is not currently supported";
-	// if (model.CipherText.None())
-	// return null;
-	// using var rsaAlgo = certificate.GetRSAPrivateKey();
-	// var aesKey = RSADecrypt(rsaAlgo, authorizedKey.EncryptedKey);
-	// var aesIV = RSADecrypt(rsaAlgo, authorizedKey.EncryptedIV);
-	// var jsonBytes = AES256Decrypt(model.CipherText, aesKey, aesIV);
-	// if (jsonBytes[0] != 17)
-	// return "ERROR: Something went wrong while decrypting the content. Unexpected
-	// initial bytes";
-	// var skipTagAndSize = ILIntHelpers.ILIntDecode(jsonBytes[1..]).ILIntSize() +
-	// 1;
-	// return jsonBytes[skipTagAndSize..].AsUTF8String();
-
-	// static byte[] RSADecrypt(RSA rsaAlgo, byte[] data, int maxRetries = 3) {
-	// int retries = maxRetries;
-	// while (true)
-	// try {
-	// try {
-	// return rsaAlgo.Decrypt(data, RSAEncryptionPadding.OaepSHA1);
-	// } catch (CryptographicException) {
-	// return rsaAlgo.Decrypt(data,
-	// RSAEncryptionPadding.CreateOaep(HashAlgorithmName.MD5));
-	// }
-	// } catch (CryptographicException e) {
-	// if (retries-- <= 0)
-	// throw new InvalidOperationException($"Failed to decrypt data with current
-	// parameters after {maxRetries} retries", e);
-	// }
-	// }
-
-	// static byte[] AES256Decrypt(byte[] cipherData, byte[] key, byte[] iv) {
-	// if (cipherData is null)
-	// throw new ArgumentNullException(nameof(cipherData));
-	// using var source = new MemoryStream(cipherData);
-	// using var algorithm = new RijndaelManaged {
-	// KeySize = 256,
-	// BlockSize = 128,
-	// IV = iv,
-	// Key = key,
-	// Mode = CipherMode.CBC,
-	// Padding = PaddingMode.Zeros
-	// };
-	// using var cs = new CryptoStream(source, algorithm.CreateDecryptor(),
-	// CryptoStreamMode.Read);
-	// using var dest = new MemoryStream();
-	// cs.CopyTo(dest);
-	// return dest.ToArray();
-	// }
-	// }
 
 }
