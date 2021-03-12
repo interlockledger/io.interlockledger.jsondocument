@@ -15,6 +15,14 @@ import io.interlockledger.iltags.ilint.ILIntException;
 
 public final class ForX509Certificate {
 
+	public static String ToJsonPubKey(X509Certificate certificate) throws ILIntException {
+		try {
+			return "PubKey!" + ToSafeBase64(HashSha256(ToTaggedRSAPubKey(certificate))) + "#RSA";
+		} catch (final NoSuchAlgorithmException e) {
+			throw new ILIntException(e);
+		}
+	}
+
 	public static String ToKeyId(X509Certificate certificate) throws ILIntException {
 		try {
 			return "Key!" + ToSafeBase64(HashSha1(certificate.getEncoded())) + "#SHA1";
@@ -24,6 +32,14 @@ public final class ForX509Certificate {
 	}
 
 	public static String ToPubKeyHash(X509Certificate certificate) throws ILIntException {
+		try {
+			return ToSafeBase64(HashSha256(ToTaggedRSAPubKey(certificate))) + "#SHA256";
+		} catch (final NoSuchAlgorithmException e) {
+			throw new ILIntException(e);
+		}
+	}
+
+	public static byte[] ToTaggedRSAPubKey(X509Certificate certificate) throws ILIntException {
 		final PublicKey pubKey = certificate.getPublicKey();
 		if (pubKey == null || pubKey.getAlgorithm() != "RSA")
 			return null;
@@ -33,11 +49,7 @@ public final class ForX509Certificate {
 		final byte[] modulusTag = PseudoTag(16, modulus);
 		final byte[] exponentTag = PseudoTag(16, exponent);
 		final byte[] pubKeyRSAParametersTag = PseudoTag(40, modulusTag, exponentTag);
-		try {
-			return ToSafeBase64(HashSha256(pubKeyRSAParametersTag)) + "#SHA256";
-		} catch (final NoSuchAlgorithmException e) {
-			throw new ILIntException(e);
-		}
+		return pubKeyRSAParametersTag;
 	}
 
 	private static byte[] HashSha1(byte[] data) throws NoSuchAlgorithmException {
