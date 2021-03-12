@@ -1,4 +1,4 @@
-# InterlockLedger REST Client for Java - JsonStore InterlockApp Support
+# InterlockLedger REST Client for Java -  _JsonStore InterlockApp Support_
 Copyright (c) 2021 InterlockLedger Network
 
 This package is JsonStore InterlockApp support for the java client to the InterlockLedger Node REST API. 
@@ -37,6 +37,48 @@ compliant implementation to your project in order to use this library.
 To get examples about how to use this library, see the unit-tests provided with this
 code.
 
+## Version history
+
+    unreleased:
+        Initial version. Ported from the C# reference implementation.
+
+## Bug report
+
+Any bugs and suggestions may be reported directly using the 
+[GitHub Issue System](https://github.com/interlockledger/io.interlockledger.tags/issues).
+
+## Collaboration
+
+This project will be managed by the **InterlockLedger** team but any collaboration will
+be accepted and properly credited. Feel free to clone this project and propose changes
+via pull requests.
+
+It is important to notice that, for now, this project restricts itself to Java 8 only. No
+external dependencies will be allowed.
+
 ## License
 
-This library is released under a **BSD 3-Clause License**.
+This library is licensed under the **The 3-Clause BSD License**.
+
+## Support
+
+This is an OSS project, the **InterlockLedger Network** does not provide any direct
+support for this library.
+
+## FAQ
+
+### Can I use this library on commercial software?
+
+Yes. Just follow the license restrictions.
+
+### Does this this library use external dependencies?
+
+No. It is supposed to use only Java 8 core classes and nothing more.
+
+### What is the minimum Java version required to run this library?
+
+The library is restricted to Java 8 in order to make it as portable as possible.
+
+### What is the IDE used to develop this library?
+
+Primarily Eclipse but any Maven compatible IDE will work.
