@@ -16,11 +16,7 @@ import io.interlockledger.iltags.ilint.ILIntException;
 public final class ForX509Certificate {
 
 	public static String ToJsonPubKey(X509Certificate certificate) throws ILIntException {
-		try {
-			return "PubKey!" + ToSafeBase64(HashSha256(ToTaggedRSAPubKey(certificate))) + "#RSA";
-		} catch (final NoSuchAlgorithmException e) {
-			throw new ILIntException(e);
-		}
+		return "PubKey!" + ToSafeBase64(ToTaggedRSAPubKey(certificate)) + "#RSA";
 	}
 
 	public static String ToKeyId(X509Certificate certificate) throws ILIntException {
