@@ -6,16 +6,17 @@ import static io.interlockledger.extensions.ForX509Certificate.*;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 
 import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
@@ -28,9 +29,26 @@ public class EncryptedTextModel {
 	private Iterable<ReadingKeyModel> _readingKeys;
 	private int _readingKeysCount;
 
+	public EncryptedTextModel() {
+	}
+
+	public EncryptedTextModel(String cipher, byte[] cipherText, Iterable<ReadingKeyModel> readingKeys) {
+		_cipher = cipher;
+		_cipherText = cipherText;
+		_readingKeys = readingKeys;
+		_readingKeysCount = Count(_readingKeys);
+	}
+
+	public EncryptedTextModel(String cipher, String cipherText, ReadingKeyModel... readingKeys) {
+		this(cipher, Base64.getDecoder().decode(cipherText), ToIterable(readingKeys));
+	}
+
+	public int Count() {
+		return _readingKeysCount;
+	}
+
 	public String DecodedWith(X509Certificate certificate, RSAPrivateKey privateKey)
-			throws ILIntException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException,
-			BadPaddingException, IllegalBlockSizeException {
+	    throws ILIntException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
 		if (certificate == null)
 			return "ERROR: No certificate provided to decode EncryptedText";
 		if (privateKey == null)
@@ -43,9 +61,9 @@ public class EncryptedTextModel {
 		if (readingKeys == null)
 			return "ERROR: No reading keys able to decode EncryptedText";
 		for (final ReadingKeyModel rk : readingKeys) {
-			if (rk.getPublicKeyHash() == pubKeyHash && rk.getReaderId() == certKeyId) {
-				final String cipher = WithDefault(getCipher(), "AES256").toUpperCase();
-				if (cipher != "AES256")
+			if (rk.getPublicKeyHash().equals(pubKeyHash) && rk.getReaderId().equals(certKeyId)) {
+				final String cipher = WithDefault(getCipher(), "AES256");
+				if (!cipher.equalsIgnoreCase("AES256"))
 					return "ERROR: Cipher " + cipher + " is not currently supported";
 				if (getCipherText() == null)
 					return null;
@@ -58,8 +76,7 @@ public class EncryptedTextModel {
 					return "ERROR: Something went wrong while decrypting the content. Unexpected initial bytes";
 				final long textSize = ILIntCodec.decode(bb);
 				final int sizeSize = ILIntCodec.getEncodedSize(textSize);
-				return new String(Arrays.copyOfRange(jsonBytes, sizeSize + 1, jsonBytes.length - 1),
-						StandardCharsets.UTF_8);
+				return new String(Arrays.copyOfRange(jsonBytes, sizeSize + 1, jsonBytes.length - 1), StandardCharsets.UTF_8);
 			}
 		}
 		return "ERROR: Your key does not match one of the authorized reading keys";
@@ -85,26 +102,14 @@ public class EncryptedTextModel {
 		_cipherText = cipherText;
 	}
 
-	public void setReadingKeys(Iterable<ReadingKeyModel> readingKeys) {
-		_readingKeys = readingKeys;
-		_readingKeysCount = Count(_readingKeys);
-	}
-
 	public void setReadingKeys(ReadingKeyModel... readingKeys) {
-		setReadingKeys(ToIterable(readingKeys));
+		_readingKeys = ToIterable(readingKeys);
+		_readingKeysCount = Count(_readingKeys);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Encrypted Json with %s for %d keys with content \"%s\"", _cipher, _readingKeysCount,
-				Ellipsis(ToSafeBase64(_cipherText), 135));
-	}
-
-	public static byte[] RSADecrypt(RSAPrivateKey privateKey, byte[] data) throws NoSuchPaddingException,
-			NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-		final Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
-		cipher.init(Cipher.DECRYPT_MODE, privateKey);
-		return cipher.doFinal(data);
+		return String.format("Encrypted Json with %s for %d keys with content \"%s\"", _cipher, _readingKeysCount, Ellipsis(ToSafeBase64(_cipherText), 135));
 	}
 
 	private static int Count(Iterable<ReadingKeyModel> readingKeys) {

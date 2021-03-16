@@ -64,8 +64,7 @@ public final class ForX509Certificate {
 		for (final byte[] part : parts) {
 			partsTotalLength += part.length;
 		}
-		final ByteBuffer buffer = ByteBuffer
-				.allocate(tagIdSize + ILIntCodec.getEncodedSize(partsTotalLength) + partsTotalLength);
+		final ByteBuffer buffer = ByteBuffer.allocate(tagIdSize + ILIntCodec.getEncodedSize(partsTotalLength) + partsTotalLength);
 		ILIntCodec.encode(tagId, buffer);
 		ILIntCodec.encode(partsTotalLength, buffer);
 		for (final byte[] part : parts) {
