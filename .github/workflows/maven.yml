@@ -20,5 +20,6 @@ jobs:
       uses: actions/setup-java@v3.5.1
       with:
         java-version: 15.0.2
+        distribution: 'temurin'
     - name: Build with Maven
       run: mvn -V -B -q package --file pom.xml
