@@ -1,5 +1,5 @@
 # InterlockLedger REST Client for Java -  _JsonStore InterlockApp Support_
-Copyright (c) 2021 InterlockLedger Network
+Copyright (c) 2022 InterlockLedger Network
 
 This package is JsonStore InterlockApp support for the java client to the InterlockLedger Node REST API. 
 It encodes/decodes JsonStore structures sent/returned to/from an InterlockLedger Node (and chains) enabled for the JsonStore InterlockApp.
@@ -73,7 +73,10 @@ Yes. Just follow the license restrictions.
 
 ### Does this this library use external dependencies?
 
-No. It is supposed to use only Java 8 core classes and nothing more.
+Yes. It uses Java 8 core classes and:
+- com.fasterxml.jackson.core.jackson-databind
+- org.bouncycastle.bcpkix-jdk15on
+- io.interlockledger.tags
 
 ### What is the minimum Java version required to run this library?
 
