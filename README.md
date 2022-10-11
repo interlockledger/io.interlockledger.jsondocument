@@ -41,6 +41,8 @@ code.
 
     unreleased:
         Initial version. Ported from the C# reference implementation.
+    v0.0.5-SNAPSHOT:
+        Some CVE fixes on dependencies
 
 ## Bug report
 
@@ -53,8 +55,8 @@ This project will be managed by the **InterlockLedger** team but any collaborati
 be accepted and properly credited. Feel free to clone this project and propose changes
 via pull requests.
 
-It is important to notice that, for now, this project restricts itself to Java 8 only. No
-external dependencies will be allowed.
+It is important to notice that, for now, this project restricts itself to Java 8 only. 
+Limited dependencies are allowed.
 
 ## License
 
