@@ -49,8 +49,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>1.79</version>
+			<artifactId>bcpkix-jdk18on</artifactId>
+			<version>1.81</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -60,4 +60,5 @@
 		</dependency>
 	</dependencies>
 </project>
+
 
